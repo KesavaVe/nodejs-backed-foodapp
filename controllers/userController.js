@@ -18,7 +18,7 @@ const checkAuth = (req, res, next) => {
 }
 const createUser = async (req, res)=> {
     try{
-        const {name, email, phone, password} = req.body;
+        const {username, email, phone, password} = req.body;
 
         const alreadyUser = await User.findOne({email});
         if(alreadyUser){
@@ -36,11 +36,21 @@ const createUser = async (req, res)=> {
             password: hashPassword
         })
         await newUser.save();
-        res.status(200).json({message : "Successfully Created"})
+         req.session.user = {
+               
+                username: newUser.username,
+                email: newUser.email
+            };
+          req.session.save(() => {
+                res.redirect(`${process.env.BASE_URL}/food/api/signin`);
+            });
+            
 
     }catch(err){
         console.log(err)
-        res.status(500).json({message: "Serever Error"})
+          return res.render("register", {
+                error: "Server Error"
+            });
 
     }
 }
@@ -69,14 +79,15 @@ const loginUser = async(req, res) => {
                 email: user.email
             };
           req.session.save(() => {
-    // ðŸ”¥ IMPORTANT: redirect to React app
-                res.redirect('https://portalapp.info/food/dashboard');
+                res.redirect(`${process.env.BASE_URL}/food/dashboard`);
             });
-        // res.rednder('food/dashboard')
+      
         
     }catch(err){
         console.log(err)
-        res.status(500).json({message : "Server Error"})
+         return res.render("signin", {
+                error: "Server Error"
+            });
 
     }
 

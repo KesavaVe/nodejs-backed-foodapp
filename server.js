@@ -14,7 +14,7 @@ app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
-    origin : "your domain name",
+    origin : `${process.env.BASE_URL}`,
     credentials : true
 }));
 
